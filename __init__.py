@@ -36,20 +36,19 @@ atributos = {
             "destreza": 0,
             "inteligencia": 0,
             "carisma": 0,
-            "resistencia": 0
+            "vontade": 0
             }
 
 for chave in atributos:
-    while True:
-        try:
-            valor = int(input(f"Quantos pontos em {chave}? (Pontos restantes: {pontos_disponiveis}) "))
-            if 0 <= valor <= pontos_disponiveis:
-                atributos[chave] = valor
-                pontos_disponiveis -= valor
-            else:
-                print("Valor inválido. Tente novamente.")
-        except ValueError:
-            print("Por favor, digite um número inteiro.")
+    try:
+        valor = int(input(f"Quantos pontos em {chave}? (Pontos restantes: {pontos_disponiveis}) "))
+        if 0 <= valor <= pontos_disponiveis:
+            atributos[chave] = valor
+            pontos_disponiveis -= valor
+        else:
+            print("Valor inválido. Tente novamente.")
+    except ValueError:
+        print("Por favor, digite um número inteiro.")
 
 
 personagem = ficha_jogador(nome, raca, aparencia, historia, habilidade, atributos)
