@@ -1,39 +1,49 @@
 import json
 import os
 import customtkinter as ctk
+from abc import ABC, abstractmethod
 # -----------------------
-ctk.set_appearance_mode("dark")
 
-def open_window():
-    new_win = ctk.CTkToplevel(app)
-    new_win.title("Nova Ficha")
-    new_win.geometry("500x400")
-    label = ctk.CTkLabel(
-        new_win,
-        text="Nova ficha",
-        font=("Arial", 18),
-    )
-    label.pack(pady=20)
-    button_break = ctk.CTkButton(
-        new_win,
-        text="Fechar",
-        command=new_win.destroy,
-    )
-    button_break.pack(pady=20)
+class BaseJanela(ctk.CTkToplevel, ABC):
+    def __init__(self, master, title = "Janela", size = "500x300"):
+        super().__init__(master)
+        self.title = title
+        self.geometry(size)
+        self.build_widget()
+    
+    @abstractmethod
+    def build_widget(self):
+        ''' Cada classe deve construir seus próprios widgets :)'''
+        pass
+
+class new_record(BaseJanela):
+    def build_widget(self):
+        label = ctk.CTkLabel(self, text="Nova Ficha", font=("Arial", 20))
+        label.pack(pady=20)
+
+        botao = ctk.CTkButton(self, text="Fechar", command=self.destroy)
+        botao.pack(pady=20)
+
+class JanelaConfig(BaseJanela):
+    def build_widget(self):
+        label = ctk.CTkLabel(self, text="Configurações", font=("Arial", 18))
+        label.pack(pady=20)
+
+        check = ctk.CTkCheckBox(self, text="Ativar modo caótico")
+        check.pack(pady=10)
 
 app = ctk.CTk()
 app.title("Criador de Fichas")
-app.geometry("500x200")
+app.geometry("550x300")
 
-campo_1 = ctk.CTkLabel(
-    app,
-    text="Olá, bem vindo ao criador de fichas!",
-    font=("Arial", 25),
-    corner_radius=10,
-)
+campo_1 = ctk.CTkLabel(app, text="Bem-vindo!", font=("Arial", 25))
 campo_1.pack(pady=20)
-button_1 = ctk.CTkButton(app, text='Criar uma Ficha', command=open_window)
-button_1.pack(pady=20, expand=True)
+
+btn1 = ctk.CTkButton(app, text="Abrir Ficha", command=lambda: new_record(app, "Ficha"))
+btn1.pack(pady=10)
+
+btn2 = ctk.CTkButton(app, text="Abrir Config", command=lambda: JanelaConfig(app, "Config"))
+btn2.pack(pady=10)
 
 app.mainloop()
 
