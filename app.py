@@ -2,8 +2,24 @@ import json
 import os
 import customtkinter as ctk
 # -----------------------
-
 ctk.set_appearance_mode("dark")
+
+def open_window():
+    new_win = ctk.CTkToplevel(app)
+    new_win.title("Nova Ficha")
+    new_win.geometry("500x400")
+    label = ctk.CTkLabel(
+        new_win,
+        text="Nova ficha",
+        font=("Arial", 18),
+    )
+    label.pack(pady=20)
+    button_break = ctk.CTkButton(
+        new_win,
+        text="Fechar",
+        command=new_win.destroy,
+    )
+    button_break.pack(pady=20)
 
 app = ctk.CTk()
 app.title("Criador de Fichas")
@@ -16,7 +32,7 @@ campo_1 = ctk.CTkLabel(
     corner_radius=10,
 )
 campo_1.pack(pady=20)
-button_1 = ctk.CTkButton(app, text='Criar uma Ficha')
+button_1 = ctk.CTkButton(app, text='Criar uma Ficha', command=open_window)
 button_1.pack(pady=20, expand=True)
 
 app.mainloop()
