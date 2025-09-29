@@ -1,0 +1,7 @@
+para criar uma janela/interface em python:
+
+1 - Configurar a aparencia 
+2 - criar a janela principal 
+3 - Criar os campos
+4 - Criar as funcionalidades
+5 - Inicar a aplicação
