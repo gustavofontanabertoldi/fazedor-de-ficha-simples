@@ -79,7 +79,7 @@ class JanelaFicha(ctk.CTkToplevel):
         btn_salvar = ctk.CTkButton(frame_bottom, text="Salvar")
         btn_salvar.pack(side="right", padx=10, pady=5)
 
-        btn_cancelar = ctk.CTkButton(frame_bottom, text="Cancelar")
+        btn_cancelar = ctk.CTkButton(frame_bottom, text="Cancelar", command=self.destroy)
         btn_cancelar.pack(side="right", padx=10, pady=5)
 
 # Teste rápido
