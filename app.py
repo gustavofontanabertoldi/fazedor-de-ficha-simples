@@ -7,91 +7,92 @@ import customtkinter as ctk
 
 import customtkinter as ctk
 
+import customtkinter as ctk
+
 class JanelaFicha(ctk.CTkToplevel):
     def __init__(self, master=None):
         super().__init__(master)
-        self.title("Ficha")
-        self.geometry("600x600")
+        self.title("Ficha RPG")
+        self.geometry("800x600")
         self.build_widgets()
 
     def build_widgets(self):
-        # Configura o grid da janela
-        self.grid_rowconfigure(0, weight=0)   # label
-        self.grid_rowconfigure(1, weight=1)   # frame_1
-        self.grid_rowconfigure(2, weight=1)   # frame_2
-        self.grid_rowconfigure(3, weight=1)   # frame_3
-        self.grid_columnconfigure(0, weight=0)
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_columnconfigure(2, weight=0)
+        # Configuração do grid principal
+        self.grid_rowconfigure(0, weight=1)   # conteúdo
+        self.grid_rowconfigure(1, weight=0)   # botões embaixo
+        self.grid_columnconfigure(0, weight=0)  # menu lateral
+        self.grid_columnconfigure(1, weight=1)  # conteúdo principal
 
-        label = ctk.CTkLabel(self, text="Nova Ficha", font=("Arial", 20))
-        label.grid(row=0, column=1, pady=20)
+        # --- MENU LATERAL (como no exemplo)
+        frame_menu = ctk.CTkFrame(self, fg_color="gray20", corner_radius=10)
+        frame_menu.grid(row=0, column=0, padx=10, pady=10, sticky="ns")
 
-        frame_1 = ctk.CTkFrame(self, corner_radius=5, fg_color="gray30")
-        frame_1.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+        # btn_nome = ctk.CTkButton(frame_menu, text="Nome")
+        # btn_nome.pack(pady=10, padx=10)
 
-        frame_2 = ctk.CTkFrame(self, corner_radius=5, fg_color="gray30")
-        frame_2.grid(row=2, column=2, padx=10, pady=10, sticky="nsew")
+        # btn_historia = ctk.CTkButton(frame_menu, text="História")
+        # btn_historia.pack(pady=10, padx=10)
 
-        frame_3 = ctk.CTkFrame(self, corner_radius=5, fg_color="gray30")
-        frame_3.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
+        # btn_atributos = ctk.CTkButton(frame_menu, text="Atributos")
+        # btn_atributos.pack(pady=10, padx=10)
 
-        label_frame_1_nome = ctk.CTkLabel(frame_1, text="Nome do personagem:", fg_color='gray', corner_radius=5)
-        entry_frame_1_nome = ctk.CTkEntry(frame_1, placeholder_text="Digite aqui o nome")
-        label_frame_1_nome.pack(pady=10)
-        entry_frame_1_nome.pack()
-        label_frame_2_nome = ctk.CTkLabel(frame_1, text="Idade do personagem:", fg_color='gray', corner_radius=5)
-        entry_frame_2_nome = ctk.CTkEntry(frame_1, placeholder_text="Digite aqui a idade")
-        label_frame_2_nome.pack(pady=10)
-        entry_frame_2_nome.pack()
+        # --- ÁREA PRINCIPAL
+        frame_main = ctk.CTkFrame(self, fg_color="gray25", corner_radius=10)
+        frame_main.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
+        # dividir a área principal em grid
+        frame_main.grid_rowconfigure(0, weight=0)  # título
+        frame_main.grid_rowconfigure(1, weight=1)  # formulário
+        frame_main.grid_columnconfigure(0, weight=1)
 
-class JanelaConfig(ctk.CTkToplevel):
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.title("Configurações")
-        self.geometry("400x300")
-        self.build_widgets()
+        label_title = ctk.CTkLabel(frame_main, text="Nova Ficha", font=("Arial", 20))
+        label_title.grid(row=0, column=0, pady=10)
 
-    def build_widgets(self):
-        self.grid_rowconfigure(0, weight=0)
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        # Sub-frame com campos
+        frame_form = ctk.CTkFrame(frame_main, fg_color="gray30", corner_radius=10)
+        frame_form.grid(row=1, column=0, padx=20, pady=10, sticky="nsew")
 
-        label = ctk.CTkLabel(self, text="Configurações", font=("Arial", 18))
-        label.grid(row=0, column=0, pady=20)
+        # Campos dentro do formulário
+        label_nome = ctk.CTkLabel(frame_form, text="Nome:")
+        label_nome.grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        entry_nome = ctk.CTkEntry(frame_form, placeholder_text="Digite o nome")
+        entry_nome.grid(row=0, column=1, padx=5, pady=5, sticky="we")
 
-        check = ctk.CTkCheckBox(self, text="Ativar modo caótico")
-        check.grid(row=1, column=0, pady=10)
+        label_idade = ctk.CTkLabel(frame_form, text="Idade:")
+        label_idade.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        entry_idade = ctk.CTkEntry(frame_form, placeholder_text="Digite a idade")
+        entry_idade.grid(row=1, column=1, padx=5, pady=5, sticky="we")
 
+        label_historia = ctk.CTkLabel(frame_form, text="História:")
+        label_historia.grid(row=2, column=0, padx=5, pady=5, sticky="ne")
+        textbox_historia = ctk.CTkTextbox(frame_form, width=300, height=150)
+        textbox_historia.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
 
-# Janela principal
-app = ctk.CTk()
-app.title("Criador de Fichas")
-app.geometry("600x400")
+        # Deixar a coluna 1 expandir
+        frame_form.grid_columnconfigure(1, weight=1)
+        frame_form.grid_rowconfigure(2, weight=1)
 
-# Configurar grid principal
-app.grid_rowconfigure(0, weight=0)   # topo
-app.grid_rowconfigure(1, weight=1)   # meio
-app.grid_rowconfigure(2, weight=0)   # botões
-app.grid_columnconfigure(0, weight=1)
+        # --- BOTÕES EMBAIXO
+        frame_bottom = ctk.CTkFrame(self, fg_color="gray20", corner_radius=10)
+        frame_bottom.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
-frame_top = ctk.CTkFrame(app, corner_radius=10, fg_color="gray20")
-frame_top.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        btn_salvar = ctk.CTkButton(frame_bottom, text="Salvar")
+        btn_salvar.pack(side="right", padx=10, pady=5)
 
-frame_bottom = ctk.CTkFrame(app, corner_radius=10, fg_color="gray30")
-frame_bottom.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+        btn_cancelar = ctk.CTkButton(frame_bottom, text="Cancelar")
+        btn_cancelar.pack(side="right", padx=10, pady=5)
 
-label_1 = ctk.CTkLabel(frame_top, text="Bem Vindo!", font=("Arial", 20))
-label_1.pack(pady=20)  # aqui pode usar pack porque está DENTRO do frame_top, não na mesma hierarquia
+# Teste rápido
+if __name__ == "__main__":
+    ctk.set_default_color_theme("dark-blue")
+    app = ctk.CTk()
+    app.geometry("900x700")
 
-btn1 = ctk.CTkButton(frame_bottom, text="Abrir Ficha", command=lambda: JanelaFicha())
-btn1.pack(pady=10)
+    btn_open = ctk.CTkButton(app, text="Abrir Ficha", command=lambda: JanelaFicha(app))
+    btn_open.pack(pady=20)
 
-btn2 = ctk.CTkButton(frame_bottom, text="Abrir Config", command=lambda: JanelaConfig())
-btn2.pack(pady=10)
+    app.mainloop()
 
-app.mainloop()
 
 
 #------------------------
