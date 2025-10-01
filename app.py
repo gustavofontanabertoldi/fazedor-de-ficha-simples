@@ -84,6 +84,7 @@ class JanelaFicha(ctk.CTkToplevel):
 
 # Teste rápido
 if __name__ == "__main__":
+    ctk.set_appearance_mode("dark")
     ctk.set_default_color_theme("dark-blue")
     app = ctk.CTk()
     app.geometry("900x700")
