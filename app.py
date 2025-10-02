@@ -1,153 +1,161 @@
 import json
 import os
 import customtkinter as ctk
-from abc import ABC, abstractmethod
-# -----------------------
-import customtkinter as ctk
 
+# -------------------------
+# MODELO (dados da ficha)
+# -------------------------
+class FichaJogador:
+    def __init__(self, nome="", idade="", historia="", atributos=None):
+        self.nome = nome
+        self.idade = idade
+        self.historia = historia
+        self.atributos = atributos or {
+            "Força": 0,
+            "Destreza": 0,
+            "Inteligência": 0,
+            "Carisma": 0,
+            "Vontade": 0,
+        }
+
+    def para_dict(self):
+        return {
+            "nome": self.nome,
+            "idade": self.idade,
+            "historia": self.historia,
+            "atributos": self.atributos,
+        }
+
+    @classmethod
+    def de_dict(cls, data):
+        return cls(
+            nome=data.get("nome", ""),
+            idade=data.get("idade", ""),
+            historia=data.get("historia", ""),
+            atributos=data.get("atributos", {}),
+        )
+
+# -------------------------
+# SERVIÇOS (salvar/carregar)
+# -------------------------
+class FichaService:
+    @staticmethod
+    def salvar(ficha: FichaJogador, pasta="fichas"):
+        os.makedirs(pasta, exist_ok=True)
+        caminho = os.path.join(pasta, f"{ficha.nome}.json")
+        with open(caminho, "w", encoding="utf-8") as arq:
+            json.dump(ficha.para_dict(), arq, indent=4, ensure_ascii=False)
+        return caminho
+
+    @staticmethod
+    def carregar(caminho: str) -> FichaJogador:
+        with open(caminho, "r", encoding="utf-8") as arq:
+            data = json.load(arq)
+        return FichaJogador.de_dict(data)
+
+# -------------------------
+# INTERFACE (Tkinter)
+# -------------------------
 class JanelaFicha(ctk.CTkToplevel):
     def __init__(self, master=None):
         super().__init__(master)
         self.title("Ficha RPG")
         self.geometry("800x600")
+
+        self.entry_nome = None
+        self.entry_idade = None
+        self.textbox_historia = None
+        self.entries_atributos = {}
+
         self.build_widgets()
 
     def build_widgets(self):
-        # Configuração do grid principal
-        self.grid_rowconfigure(0, weight=1)   # conteúdo
-        self.grid_rowconfigure(1, weight=0)   # botões embaixo
-        self.grid_columnconfigure(0, weight=0)  # menu lateral
-        self.grid_columnconfigure(1, weight=1)  # conteúdo principal
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=0)
+        self.grid_columnconfigure(0, weight=0)
+        self.grid_columnconfigure(1, weight=1)
 
-        # --- MENU LATERAL (como no exemplo)
+        # MENU LATERAL
         frame_menu = ctk.CTkFrame(self, fg_color="gray20", corner_radius=10)
-        frame_menu.grid(row=0, column=0, padx=10, pady=10, sticky="ns")
+        frame_menu.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-        # btn_nome = ctk.CTkButton(frame_menu, text="Nome")
-        # btn_nome.pack(pady=10, padx=10)
+        side_label = ctk.CTkLabel(frame_menu, text="Atributos", font=("Arial", 18))
+        side_label.pack(pady=10)
 
-        # btn_historia = ctk.CTkButton(frame_menu, text="História")
-        # btn_historia.pack(pady=10, padx=10)
+        for atributo in ["Força", "Destreza", "Inteligência", "Carisma", "Vontade"]:
+            row = ctk.CTkFrame(frame_menu, fg_color="gray25")
+            row.pack(fill="x", padx=5, pady=2)
+            lbl = ctk.CTkLabel(row, text=atributo, width=80, anchor="w")
+            lbl.pack(side="left", padx=5)
+            entry = ctk.CTkEntry(row, width=40)
+            entry.insert(0, "0")
+            entry.pack(side="right", padx=5)
+            self.entries_atributos[atributo] = entry
 
-        # btn_atributos = ctk.CTkButton(frame_menu, text="Atributos")
-        # btn_atributos.pack(pady=10, padx=10)
-
-        # --- ÁREA PRINCIPAL
+        # ÁREA PRINCIPAL
         frame_main = ctk.CTkFrame(self, fg_color="gray25", corner_radius=10)
         frame_main.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
-        # dividir a área principal em grid
-        frame_main.grid_rowconfigure(0, weight=0)  # título
-        frame_main.grid_rowconfigure(1, weight=1)  # formulário
-        frame_main.grid_columnconfigure(0, weight=1)
-
         label_title = ctk.CTkLabel(frame_main, text="Nova Ficha", font=("Arial", 20))
-        label_title.grid(row=0, column=0, pady=10)
+        label_title.pack(pady=10)
 
-        # Sub-frame com campos
+        # FORMULÁRIO
         frame_form = ctk.CTkFrame(frame_main, fg_color="gray30", corner_radius=10)
-        frame_form.grid(row=1, column=0, padx=20, pady=10, sticky="nsew")
+        frame_form.pack(fill="both", expand=True, padx=20, pady=10)
 
-        # Campos dentro do formulário
-        label_nome = ctk.CTkLabel(frame_form, text="Nome:")
-        label_nome.grid(row=0, column=0, padx=5, pady=5, sticky="e")
-        entry_nome = ctk.CTkEntry(frame_form, placeholder_text="Digite o nome")
-        entry_nome.grid(row=0, column=1, padx=5, pady=5, sticky="we")
+        self.entry_nome = self._add_field(frame_form, "Nome:", 0)
+        self.entry_idade = self._add_field(frame_form, "Idade:", 1)
 
-        label_idade = ctk.CTkLabel(frame_form, text="Idade:")
-        label_idade.grid(row=1, column=0, padx=5, pady=5, sticky="e")
-        entry_idade = ctk.CTkEntry(frame_form, placeholder_text="Digite a idade")
-        entry_idade.grid(row=1, column=1, padx=5, pady=5, sticky="we")
+        lbl_hist = ctk.CTkLabel(frame_form, text="História:")
+        lbl_hist.grid(row=2, column=0, padx=5, pady=5, sticky="ne")
+        self.textbox_historia = ctk.CTkTextbox(frame_form, width=300, height=150)
+        self.textbox_historia.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
 
-        label_historia = ctk.CTkLabel(frame_form, text="História:")
-        label_historia.grid(row=2, column=0, padx=5, pady=5, sticky="ne")
-        textbox_historia = ctk.CTkTextbox(frame_form, width=300, height=150)
-        textbox_historia.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
-
-        # Deixar a coluna 1 expandir
         frame_form.grid_columnconfigure(1, weight=1)
         frame_form.grid_rowconfigure(2, weight=1)
 
-        # --- BOTÕES EMBAIXO
+        # BOTÕES
         frame_bottom = ctk.CTkFrame(self, fg_color="gray20", corner_radius=10)
         frame_bottom.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
-        btn_salvar = ctk.CTkButton(frame_bottom, text="Salvar")
+        btn_salvar = ctk.CTkButton(frame_bottom, text="Salvar", command=self.salvar_ficha)
         btn_salvar.pack(side="right", padx=10, pady=5)
 
         btn_cancelar = ctk.CTkButton(frame_bottom, text="Cancelar", command=self.destroy)
         btn_cancelar.pack(side="right", padx=10, pady=5)
 
-# Teste rápido
+    def _add_field(self, master, label, row):
+        lbl = ctk.CTkLabel(master, text=label)
+        lbl.grid(row=row, column=0, padx=5, pady=5, sticky="e")
+        entry = ctk.CTkEntry(master)
+        entry.grid(row=row, column=1, padx=5, pady=5, sticky="we")
+        return entry
+
+    def salvar_ficha(self):
+        atributos = {k: int(v.get() or 0) for k, v in self.entries_atributos.items()}
+        ficha = FichaJogador(
+            nome=self.entry_nome.get(),
+            idade=self.entry_idade.get(),
+            historia=self.textbox_historia.get("1.0", "end").strip(),
+            atributos=atributos
+        )
+        caminho = FichaService.salvar(ficha)
+        print(f"Ficha salva em: {caminho}")
+
+# -------------------------
+# APP PRINCIPAL
+# -------------------------
 if __name__ == "__main__":
     ctk.set_appearance_mode("dark")
     ctk.set_default_color_theme("dark-blue")
+
     app = ctk.CTk()
-    app.geometry("900x700")
+    app.geometry("400x200")
+
+    label = ctk.CTkLabel(app, text="Bem Vindo!", font=("Arial", 20))
+    label.pack(pady=20)
 
     btn_open = ctk.CTkButton(app, text="Abrir Ficha", command=lambda: JanelaFicha(app))
     btn_open.pack(pady=20)
 
     app.mainloop()
-
-
-
-#------------------------
-# class ficha_jogador:
-#     def __init__(self, nome, raca, aparencia, historia, habilidade, atributos):
-#         self.nome = nome
-#         self.raca = raca
-#         self.aparencia = aparencia
-#         self.historia = historia
-#         self.habilidade = habilidade
-#         self.atributos = atributos
-    
-    
-
-#     def para_dict(self):
-#         return {
-#             "nome": self.nome,
-#             "raca": self.raca,
-#             "aparencia": self.aparencia,
-#             "historia": self.historia,
-#             "habilidade": self.habilidade,
-#             "Atributos": self.atributos
-#         }
-    
-# nome = input("Digite o nome do personagem: ")
-# raca = input("Digite a raça: ")
-# aparencia = input("Descreva a aparência: ")
-# historia = input("Conte um pouco da história: ")
-# habilidade = input("Descreva a habilidade especial: ")
-# os.system('cls' if os.name == 'nt' else 'clear')
-# print("Você tem 5 pontos para distribuir nos atributos.")
-
-# pontos_disponiveis = 5
-# atributos = {
-#             "forca": 0,
-#             "destreza": 0,
-#             "inteligencia": 0,
-#             "carisma": 0,
-#             "vontade": 0
-#             }
-
-# for chave in atributos:
-#     try:
-#         valor = int(input(f"Quantos pontos em {chave}? (Pontos restantes: {pontos_disponiveis}) "))
-#         if 0 <= valor <= pontos_disponiveis:
-#             atributos[chave] = valor
-#             pontos_disponiveis -= valor
-#         else:
-#             print("Valor inválido. Tente novamente.")
-#     except ValueError:
-#         print("Por favor, digite um número inteiro.")
-
-
-# personagem = ficha_jogador(nome, raca, aparencia, historia, habilidade, atributos)
-
-# os.system('cls' if os.name == 'nt' else 'clear')
-
-# with open(f"{nome}.json", "w", encoding="utf-8") as arquivo:
-#     json.dump(personagem.para_dict(), arquivo, indent=4, ensure_ascii= False)
-
-# print(f"Ficha salva com sucesso no arquivo: {nome}.json")
