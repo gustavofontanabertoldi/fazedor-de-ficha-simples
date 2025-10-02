@@ -5,10 +5,6 @@ from abc import ABC, abstractmethod
 # -----------------------
 import customtkinter as ctk
 
-import customtkinter as ctk
-
-import customtkinter as ctk
-
 class JanelaFicha(ctk.CTkToplevel):
     def __init__(self, master=None):
         super().__init__(master)
